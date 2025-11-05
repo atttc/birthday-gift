@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日许愿池</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, rgba(253, 245, 252, 0.8), rgba(232, 242, 177, 0.8)), 
+                        url('balloon.png') center/cover no-repeat;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #5a5a5a;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        header {
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #8a6d3b;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            color: #a17e4b;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .wish-pool {
+            background-color: rgba(227, 225, 246, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+        
+        .wish-pool::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: linear-gradient(90deg, #bed7a1, #e8f2b1, #f4bfe3, #e3e1f6);
+        }
+        
+        .pool-water {
+            background: linear-gradient(to bottom, rgba(190, 215, 161, 0.7), rgba(227, 225, 246, 0.9));
+            border-radius: 15px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .coins-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 10px;
+        }
+        
+        .coin {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #ffd700, #ffa500);
+            border-radius: 50%;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #8a6d3b;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .coin:hover {
+            transform: scale(1.1);
+        }
+        
+        .wish-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border: 2px solid #bed7a1;
+            border-radius: 10px;
+            resize: none;
+            font-size: 1rem;
+            background-color: rgba(253, 245, 252, 0.9);
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .throw-btn {
+            background-color: #bed7a1;
+            color: #5a5a5a;
+        }
+        
+        .throw-btn:hover {
+            background-color: #a8c285;
+            transform: translateY(-3px);
+        }
+        
+        .continue-btn {
+            background-color: #f4bfe3;
+            color: #5a5a5a;
+        }
+        
+        .continue-btn:hover {
+            background-color: #e9a8d1;
+            transform: translateY(-3px);
+        }
+        
+        .wish-counter {
+            background-color: #e8f2b1;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #8a6d3b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(253, 245, 252, 0.9);
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .wish-pool {
+                padding: 15px;
+            }
+            
+            .pool-water {
+                height: 250px;
+            }
+            
+            .coin {
+                width: 35px;
+                height: 35px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="floating">生日许愿池</h1>
+            <p class="subtitle">写下你的愿望，向池中投下硬币，愿望就会成真！</p>
+        </header>
+        
+        <main>
+            <div class="wish-pool">
+                <div class="pool-water" id="poolWater">
+                    <div class="coins-container" id="coinsContainer">
+                        <!-- 硬币将通过JS动态添加 -->
+                    </div>
+                </div>
+                
+                <div class="wish-counter">
+                    已投下 <span id="wishCount">0</span> 个愿望
+                </div>
+                
+                <form class="wish-form">
+                    <textarea id="wishText" placeholder="在这里写下你的生日愿望..."></textarea>
+                    <button type="button" class="throw-btn" id="throwBtn">投下愿望硬币</button>
+                </form>
+                
+                <div class="message" id="message">
+                    你的愿望已被许愿池接收！祝你美梦成真！
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="continue-btn" id="continueBtn">继续</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const poolWater = document.getElementById('poolWater');
+            const coinsContainer = document.getElementById('coinsContainer');
+            const wishText = document.getElementById('wishText');
+            const throwBtn = document.getElementById('throwBtn');
+            const continueBtn = document.getElementById('continueBtn');
+            const wishCount = document.getElementById('wishCount');
+            const message = document.getElementById('message');
+            
+            let coinCount = 0;
+            const maxCoins = 15;
+            
+            // 创建涟漪效果
+            function createRipple(x, y) {
+                const ripple = document.createElement('div');
+                ripple.classList.add('ripple');
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                poolWater.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            }
+            
+            // 投币功能
+            throwBtn.addEventListener('click', function() {
+                if (wishText.value.trim() === '') {
+                    alert('请先写下你的愿望！');
+                    return;
+                }
+                
+                if (coinCount >= maxCoins) {
+                    alert('许愿池已经满了，先看看你的愿望吧！');
+                    return;
+                }
+                
+                // 创建新硬币
+                const coin = document.createElement('div');
+                coin.classList.add('coin');
+                coin.textContent = '愿';
+                
+                // 随机位置
+                const randomLeft = Math.random() * 80 + 10;
+                coin.style.left = randomLeft + '%';
+                coin.style.bottom = '10px';
+                
+                coinsContainer.appendChild(coin);
+                
+                // 增加计数
+                coinCount++;
+                wishCount.textContent = coinCount;
+                
+                // 显示消息
+                message.style.display = 'block';
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 3000);
+                
+                // 清空输入框
+                wishText.value = '';
+                
+                // 添加涟漪效果
+                const rect = poolWater.getBoundingClientRect();
+                createRipple(
+                    randomLeft / 100 * rect.width,
+                    rect.height - 50
+                );
+            });
+            
+            // 继续按钮功能
+            continueBtn.addEventListener('click', function() {
+                window.location.href = 'p2_GiftBox.html';
+            });
+            
+            // 点击硬币产生涟漪
+            poolWater.addEventListener('click', function(e) {
+                if (e.target.classList.contains('coin')) {
+                    const rect = poolWater.getBoundingClientRect();
+                    createRipple(
+                        e.clientX - rect.left,
+                        e.clientY - rect.top
+                    );
+                }
+            });
+            
+            // 添加一些初始硬币
+            for (let i = 0; i < 3; i++) {
+                const coin = document.createElement('div');
+                coin.classList.add('coin');
+                coin.textContent = '愿';
+                
+                const randomLeft = Math.random() * 80 + 10;
+                coin.style.left = randomLeft + '%';
+                coin.style.bottom = Math.random() * 50 + 10 + 'px';
+                
+                coinsContainer.appendChild(coin);
+                coinCount++;
+            }
+            wishCount.textContent = coinCount;
+        });
+    </script>
+</body>
+</html>

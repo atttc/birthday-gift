@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日迷宫小游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+        }
+        
+        body {
+            background: url('balloon.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #5a5a5a;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #f4bfe3;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0 #e3e1f6;
+        }
+        
+        .subtitle {
+            color: #bed7a1;
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+        }
+        
+        .game-container {
+            position: relative;
+            margin: 20px auto;
+            width: 500px;
+            height: 500px;
+            background-color: #e3e1f6;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #maze-canvas {
+            display: block;
+            background-color: #fdf5fc;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        #start-btn {
+            background-color: #bed7a1;
+            color: white;
+        }
+        
+        #start-btn:hover {
+            background-color: #a8c585;
+            transform: translateY(-2px);
+        }
+        
+        #continue-btn, #back-btn {
+            background-color: #f4bfe3;
+            color: white;
+        }
+        
+        #continue-btn:hover, #back-btn:hover {
+            background-color: #e9a8d1;
+            transform: translateY(-2px);
+        }
+        
+        .instructions {
+            background-color: #e8f2b1;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #f4bfe3;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .instructions li:before {
+            content: "🎁";
+            margin-right: 10px;
+        }
+        
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 10;
+            display: none;
+        }
+        
+        .message h2 {
+            color: #f4bfe3;
+            margin-bottom: 15px;
+        }
+        
+        .message p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .celebration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            display: none;
+        }
+        
+        .balloon {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        .balloon:after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 15px;
+            background-color: #e3e1f6;
+        }
+        
+        .balloon:nth-child(1) {
+            background-color: #f4bfe3;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .balloon:nth-child(2) {
+            background-color: #bed7a1;
+            left: 30%;
+            animation-delay: 1s;
+        }
+        
+        .balloon:nth-child(3) {
+            background-color: #e3e1f6;
+            left: 50%;
+            animation-delay: 2s;
+        }
+        
+        .balloon:nth-child(4) {
+            background-color: #e8f2b1;
+            left: 70%;
+            animation-delay: 3s;
+        }
+        
+        .balloon:nth-child(5) {
+            background-color: #fdf5fc;
+            left: 90%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+        
+        .direction-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .direction-row {
+            display: flex;
+        }
+        
+        .dir-btn {
+            width: 60px;
+            height: 60px;
+            margin: 5px;
+            background-color: #f4bfe3;
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+        
+        .dir-btn:hover {
+            background-color: #e9a8d1;
+            transform: translateY(-2px);
+        }
+        
+        .dir-btn:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>生日迷宫大冒险</h1>
+        <p class="subtitle">请点击开始游戏~~~~^^</p>
+        
+        <div class="game-container">
+            <canvas id="maze-canvas" width="500" height="500"></canvas>
+            
+            <div class="celebration" id="celebration">
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+            </div>
+            
+            <div class="message" id="win-message">
+                <h2>恭喜你！</h2>
+                <p>你成功找到了生日礼物！<br>继续前往下一个惊喜吧！</p>
+                <button id="continue-btn">继续</button>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">开始游戏</button>
+            <button id="back-btn">返回礼物</button>
+        </div>
+        
+        <div class="direction-controls">
+            <div class="direction-row">
+                <button class="dir-btn" id="up-btn">↑</button>
+            </div>
+            <div class="direction-row">
+                <button class="dir-btn" id="left-btn">←</button>
+                <button class="dir-btn" id="down-btn">↓</button>
+                <button class="dir-btn" id="right-btn">→</button>
+            </div>
+        </div>
+        
+        <!-- <div class="instructions">
+            <h3>游戏说明</h3>
+            <ul>
+                <li>使用键盘方向键或屏幕上的方向按钮控制角色移动</li>
+                <li>从起点（绿色）移动到终点（粉色）</li>
+                <li>避开所有墙壁，找到通往礼物的路径</li>
+                <li>完成迷宫后点击"继续"按钮返回礼物页面</li>
+            </ul>
+        </div> -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('maze-canvas');
+            const ctx = canvas.getContext('2d');
+            const startBtn = document.getElementById('start-btn');
+            const continueBtn = document.getElementById('continue-btn');
+            const backBtn = document.getElementById('back-btn');
+            const winMessage = document.getElementById('win-message');
+            const celebration = document.getElementById('celebration');
+            
+            // 方向按钮
+            const upBtn = document.getElementById('up-btn');
+            const downBtn = document.getElementById('down-btn');
+            const leftBtn = document.getElementById('left-btn');
+            const rightBtn = document.getElementById('right-btn');
+            
+            const cellSize = 25;
+            const rows = 20;
+            const cols = 20;
+            
+            let maze = [];
+            let player = { x: 1, y: 1 };
+            let gameActive = false;
+            
+            // 初始化迷宫
+            function initializeMaze() {
+                maze = [];
+                for (let y = 0; y < rows; y++) {
+                    maze[y] = [];
+                    for (let x = 0; x < cols; x++) {
+                        maze[y][x] = 1; // 1表示墙，0表示路径
+                    }
+                }
+                
+                // 使用深度优先搜索生成迷宫
+                generateMaze(1, 1);
+                
+                // 确保起点和终点是通路
+                maze[1][1] = 0; // 起点
+                maze[rows-2][cols-2] = 0; // 终点
+                
+                drawMaze();
+            }
+            
+            // 使用深度优先搜索生成迷宫
+            function generateMaze(x, y) {
+                maze[y][x] = 0; // 标记为路径
+                
+                // 定义四个方向
+                const directions = [
+                    [0, -2], // 上
+                    [2, 0],  // 右
+                    [0, 2],  // 下
+                    [-2, 0]  // 左
+                ];
+                
+                // 随机打乱方向
+                shuffleArray(directions);
+                
+                for (let i = 0; i < directions.length; i++) {
+                    const [dx, dy] = directions[i];
+                    const newX = x + dx;
+                    const newY = y + dy;
+                    
+                    if (newX > 0 && newX < cols-1 && newY > 0 && newY < rows-1 && maze[newY][newX] === 1) {
+                        // 打通墙壁
+                        maze[y + dy/2][x + dx/2] = 0;
+                        generateMaze(newX, newY);
+                    }
+                }
+            }
+            
+            // 随机打乱数组
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            // 绘制迷宫
+            function drawMaze() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制墙壁和路径
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        if (maze[y][x] === 1) {
+                            ctx.fillStyle = '#e3e1f6'; // 墙壁颜色
+                            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                        } else {
+                            ctx.fillStyle = '#fdf5fc'; // 路径颜色
+                            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+                
+                // 绘制起点
+                ctx.fillStyle = '#bed7a1';
+                ctx.fillRect(1 * cellSize, 1 * cellSize, cellSize, cellSize);
+                
+                // 绘制终点
+                ctx.fillStyle = '#f4bfe3';
+                ctx.fillRect((cols-2) * cellSize, (rows-2) * cellSize, cellSize, cellSize);
+                
+                // 绘制玩家
+                ctx.fillStyle = '#e8f2b1';
+                ctx.beginPath();
+                ctx.arc(
+                    player.x * cellSize + cellSize/2,
+                    player.y * cellSize + cellSize/2,
+                    cellSize/2 - 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                
+                // 绘制玩家表情
+                ctx.fillStyle = '#5a5a5a';
+                ctx.beginPath();
+                ctx.arc(
+                    player.x * cellSize + cellSize/2 - 4,
+                    player.y * cellSize + cellSize/2 - 4,
+                    2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(
+                    player.x * cellSize + cellSize/2 + 4,
+                    player.y * cellSize + cellSize/2 - 4,
+                    2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(
+                    player.x * cellSize + cellSize/2,
+                    player.y * cellSize + cellSize/2 + 4,
+                    4,
+                    0,
+                    Math.PI
+                );
+                ctx.stroke();
+            }
+            
+            // 移动玩家
+            function movePlayer(dx, dy) {
+                if (!gameActive) return;
+                
+                const newX = player.x + dx;
+                const newY = player.y + dy;
+                
+                // 检查是否到达终点
+                if (newX === cols-2 && newY === rows-2) {
+                    gameActive = false;
+                    winMessage.style.display = 'block';
+                    celebration.style.display = 'block';
+                    return;
+                }
+                
+                // 检查是否可以移动（不是墙壁）
+                if (newX >= 0 && newX < cols && newY >= 0 && newY < rows && maze[newY][newX] === 0) {
+                    player.x = newX;
+                    player.y = newY;
+                    drawMaze();
+                }
+            }
+            
+            // 键盘控制
+            document.addEventListener('keydown', function(e) {
+                if (!gameActive) return;
+                
+                switch(e.key) {
+                    case 'ArrowUp':
+                        movePlayer(0, -1);
+                        break;
+                    case 'ArrowDown':
+                        movePlayer(0, 1);
+                        break;
+                    case 'ArrowLeft':
+                        movePlayer(-1, 0);
+                        break;
+                    case 'ArrowRight':
+                        movePlayer(1, 0);
+                        break;
+                }
+            });
+            
+            // 按钮控制
+            upBtn.addEventListener('click', () => movePlayer(0, -1));
+            downBtn.addEventListener('click', () => movePlayer(0, 1));
+            leftBtn.addEventListener('click', () => movePlayer(-1, 0));
+            rightBtn.addEventListener('click', () => movePlayer(1, 0));
+            
+            // 开始游戏
+            startBtn.addEventListener('click', function() {
+                player = { x: 1, y: 1 };
+                gameActive = true;
+                winMessage.style.display = 'none';
+                celebration.style.display = 'none';
+                initializeMaze();
+            });
+            
+            // 继续按钮（成功提示中的）
+            continueBtn.addEventListener('click', function() {
+                // 返回到p2_GiftBox.html
+                window.location.href = 'p2_GiftBox.html';
+            });
+            
+            // 返回礼物按钮（控制区域中的）
+            backBtn.addEventListener('click', function() {
+                // 返回到p2_GiftBox.html
+                window.location.href = 'p2_GiftBox.html';
+            });
+            
+            // 初始化迷宫
+            initializeMaze();
+        });
+    </script>
+</body>
+</html>

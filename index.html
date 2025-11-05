@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>气球主题页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('balloon.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+            z-index: -1;
+        }
+        
+        /* .container {
+            text-align: center;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            z-index: 10;
+        } */
+        
+        h1 {
+            color: #6a89cc;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        p {
+            color: #82ccdd;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #a8e6cf, #dcedc1);
+            color: #555;
+            border: none;
+            padding: 15px 40px;
+            padding: 30px 50px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(to right, #dcedc1, #ffd3b6);
+        }
+        
+        .balloons-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .balloon {
+            position: absolute;
+            bottom: -100px;
+            width: 60px;
+            height: 70px;
+            border-radius: 50%;
+            animation: float 15s linear infinite;
+        }
+        
+        .balloon:before {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .balloon:nth-child(1) {
+            left: 10%;
+            background: linear-gradient(to bottom, #a8e6cf, #88d1b8);
+            animation-delay: 0s;
+            animation-duration: 18s;
+        }
+        
+        .balloon:nth-child(2) {
+            left: 20%;
+            background: linear-gradient(to bottom, #dcedc1, #c5e1a5);
+            animation-delay: 2s;
+            animation-duration: 16s;
+        }
+        
+        .balloon:nth-child(3) {
+            left: 30%;
+            background: linear-gradient(to bottom, #ffd3b6, #ffb38a);
+            animation-delay: 4s;
+            animation-duration: 20s;
+        }
+        
+        .balloon:nth-child(4) {
+            left: 40%;
+            background: linear-gradient(to bottom, #ffaaa5, #ff8a80);
+            animation-delay: 6s;
+            animation-duration: 14s;
+        }
+        
+        .balloon:nth-child(5) {
+            left: 50%;
+            background: linear-gradient(to bottom, #dcedc1, #c5e1a5);
+            animation-delay: 8s;
+            animation-duration: 19s;
+        }
+        
+        .balloon:nth-child(6) {
+            left: 60%;
+            background: linear-gradient(to bottom, #a8e6cf, #88d1b8);
+            animation-delay: 10s;
+            animation-duration: 17s;
+        }
+        
+        .balloon:nth-child(7) {
+            left: 70%;
+            background: linear-gradient(to bottom, #ffd3b6, #ffb38a);
+            animation-delay: 12s;
+            animation-duration: 15s;
+        }
+        
+        .balloon:nth-child(8) {
+            left: 80%;
+            background: linear-gradient(to bottom, #ffaaa5, #ff8a80);
+            animation-delay: 14s;
+            animation-duration: 21s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-120vh) rotate(20deg);
+                opacity: 0;
+            }
+        }
+        
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: explode 1s ease-out forwards;
+        }
+        
+        @keyframes explode {
+            0% {
+                transform: translate(var(--x), var(--y)) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .credit {
+            position: absolute;
+            bottom: 20px;
+            color: #82ccdd;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="balloons-container">
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+    </div>
+    
+    <div class="container">
+        <!-- <h1>气球庆典</h1>
+        <p>点击页面任意位置欣赏烟花特效<br>点击下方按钮跳转到礼物盒页面</p> -->
+        <button class="btn" id="jumpBtn">点这里</button>
+    </div>
+    
+    <!-- <div class="credit">气球背景图: balloon.png</div> -->
+    
+    <script>
+        // 烟花特效
+        document.addEventListener('click', function(e) {
+            createFirework(e.clientX, e.clientY);
+        });
+        
+        function createFirework(x, y) {
+            const colors = ['#a8e6cf', '#dcedc1', '#ffd3b6', '#ffaaa5', '#6a89cc', '#82ccdd'];
+            
+            for (let i = 0; i < 50; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                
+                // 随机颜色
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                firework.style.backgroundColor = color;
+                
+                // 随机方向
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 100 + 50;
+                const xOffset = Math.cos(angle) * distance;
+                const yOffset = Math.sin(angle) * distance;
+                
+                firework.style.setProperty('--x', `${xOffset}px`);
+                firework.style.setProperty('--y', `${yOffset}px`);
+                
+                // 随机大小
+                const size = Math.random() * 5 + 2;
+                firework.style.width = `${size}px`;
+                firework.style.height = `${size}px`;
+                
+                // 随机动画延迟
+                firework.style.animationDelay = `${Math.random() * 0.5}s`;
+                
+                firework.style.left = `${x}px`;
+                firework.style.top = `${y}px`;
+                
+                document.body.appendChild(firework);
+                
+                // 动画结束后移除元素
+                setTimeout(() => {
+                    firework.remove();
+                }, 1000);
+            }
+        }
+        
+        // 跳转按钮
+        document.getElementById('jumpBtn').addEventListener('click', function() {
+            window.location.href = 'p2_GiftBox.html';
+        });
+    </script>
+</body>
+</html>
