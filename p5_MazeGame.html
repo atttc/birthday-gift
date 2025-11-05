@@ -320,7 +320,8 @@
             const leftBtn = document.getElementById('left-btn');
             const rightBtn = document.getElementById('right-btn');
             
-            const cellSize = 25;
+            // const cellSize = 25;
+            let cellSize;   // 由 setCanvasSize 动态赋值
             const rows = 20;
             const cols = 20;
             
@@ -328,6 +329,19 @@
             let player = { x: 1, y: 1 };
             let gameActive = false;
             
+            const container = document.querySelector('.game-container');
+function setCanvasSize() {
+    const sz = container.clientWidth;          // 容器实际宽度
+    canvas.width = sz;
+    canvas.height = sz;
+    cellSize = sz / cols;                      // 每格大小随之变化
+}
+window.addEventListener('resize', () => {
+    setCanvasSize();
+    drawMaze();                                // 重画迷宫和玩家
+});
+setCanvasSize();                               // 首次加载生效
+
             // 初始化迷宫
             function initializeMaze() {
                 maze = [];
